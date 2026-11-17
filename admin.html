@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo - Take Um</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        @keyframes moverFundoDiagonal {
+            0% { background-position: 0px 500px; }
+            100% { background-position: 500px 0px; }
+        }
+        
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding-top: 100px !important;
+            background: linear-gradient(var(--bg-gradient-overlay), var(--bg-gradient-overlay)), 
+                        url('images/pipoca.png');
+            background-size: 450px;
+            background-repeat: repeat;
+            animation: moverFundoDiagonal 50s linear infinite;
+            color: var(--text-main);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+ 
+        /* Tabela de Contas Cadastradas Estilizada */
+        .tabela-usuarios {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 14px;
+            text-align: left;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #e8dcd0;
+        }
+
+        .tabela-usuarios th {
+            background-color: #810000;
+            color: #ffffff;
+            padding: 12px 16px;
+            font-weight: 600;
+        }
+
+        .tabela-usuarios td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0e6d8;
+            color: #333333;
+        }
+
+        .tabela-usuarios tr:nth-child(even) {
+            background-color: #faf6ec;
+        }
+
+        .tabela-usuarios tr:hover {
+            background-color: #f8f0f0;
+        }
+
+        /* Botões de Ação dentro da Tabela */
+        .btn-acao-tabela {
+            background-color: #810000;
+            color: #ffffff;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 4px;
+            transition: background 0.2s;
+        }
+
+        .btn-acao-tabela:hover {
+            background-color: #590000;
+        }
+
+        .btn-excluir {
+            background-color: #b71c1c;
+        }
+
+        .btn-excluir:hover {
+            background-color: #7f0000;
+        }
+
+        /* Estilos do Modal de Edição */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 30px 35px;
+            width: 100%;
+            max-width: 550px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+            box-sizing: border-box;
+            border: 1px solid #f0e6d8;
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 22px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #810000;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Menu Lateral (Sidebar) -->
+    <div id="meuSidebar" class="sidebar">
+        <button class="close-btn" onclick="fecharMenu()">×</button>
+        <div style="padding: 0 24px 15px 24px; font-size: 18px; font-weight: bold; color: #810000; border-bottom: 2px solid #eee; margin-bottom: 10px;">
+            🎬 Navegação
+        </div>
+        <a href="filmes.html">🎥 Filmes em Cartaz</a>
+        <a href="compra.html">🎟️ Comprar Ingressos</a>
+        <a href="ingressos.html">📦 Meus Ingressos</a>
+        <a href="cinematch.html">🤝 CineMatch</a>
+        <a href="passaporte.html">🏆 Passaporte Digital</a>
+        <a href="login.html">🔐 Entrar / Admin</a>
+    </div>
+    <div id="sidebarOverlay" class="sidebar-overlay" onclick="fecharMenu()"></div>
+
+    <!-- Barra de Navegação -->
+    <header class="navbar">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <button class="btn-menu-lateral" onclick="abrirMenu()">☰ Menu</button>
+            <div class="logo">
+                <a href="admin.html">Painel Admin</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contentor Principal -->
+    <main class="container">
+        <h1>Painel de Controle do Administrador</h1>
+
+        <!-- Navegação das Seções Admin -->
+        <div class="tabs">
+            <button class="tab ativa" onclick="mostrarSecao('sec-filmes', this)">Gerir Filmes</button>
+            <button class="tab" onclick="mostrarSecao('sec-cinemas', this)">Gerir Cinemas</button>
+            <button class="tab" onclick="mostrarSecao('sec-precos', this)">Gerir Preços & Ingressos</button>
+            <button class="tab" onclick="mostrarSecao('sec-usuarios', this)">Gerir Contas</button>
+        </div>
+
+        <!-- SEÇÃO: GERIR FILMES -->
+        <div id="sec-filmes" class="admin-secao">
+            <h2>Adicionar Novo Filme</h2>
+            <form onsubmit="salvarFilme(event)" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div>
+                    <label style="font-weight: bold; color: #810000; font-size: 13px;">Título do Filme</label>
+                    <input type="text" class="input-padrao" style="margin-top: 6px;" required placeholder="Ex: Avatar 3">
+                </div>
+                <div>
+                    <label style="font-weight: bold; color: #810000; font-size: 13px;">Categoria</label>
+                    <select class="input-padrao" style="margin-top: 6px;">
+                        <option value="cartaz">Em Cartaz</option>
+                        <option value="futuro">Filme Futuro</option>
+                    </select>
+                </div>
+                <div style="grid-column: span 2;">
+                    <label style="font-weight: bold; color: #810000; font-size: 13px;">URL da Imagem do Poster</label>
+                    <input type="text" class="input-padrao" style="margin-top: 6px;" placeholder="images/poster.jpg">
+                </div>
+                <div style="grid-column: span 2;">
+                    <button type="submit" class="btn-comprar">Adicionar Filme</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- SEÇÃO: GERIR CINEMAS -->
+        <div id="sec-cinemas" class="admin-secao" style="display: none;">
+            <h2>Adicionar Novo Cinema</h2>
+            <form onsubmit="salvarCinema(event)" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div>
+                    <label style="font-weight: bold; color: #810000; font-size: 13px;">Nome do Cinema</label>
+                    <input type="text" class="input-padrao" style="margin-top: 6px;" required placeholder="Ex: CineBordô Central">
+                </div>
+                <div>
+                    <label style="font-weight: bold; color: #810000; font-size: 13px;">Cidade / Localização</label>
+                    <input type="text" class="input-padrao" style="margin-top: 6px;" required placeholder="Ex: Lisboa">
+                </div>
+                <div style="grid-column: span 2;">
+                    <label style="font-weight: bold; color: #810000; font-size: 13px;">Endereço Completo</label>
+                    <input type="text" class="input-padrao" style="margin-top: 6px;" placeholder="Rua das Pipocas, nº 100">
+                </div>
+                <div style="grid-column: span 2;">
+                    <button type="submit" class="btn-comprar">Adicionar Cinema</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- SEÇÃO: GERIR PREÇOS E INGRESSOS -->
+        <div id="sec-precos" class="admin-secao" style="display: none;">
+            <h2>Ajustar Tabela de Preços de Ingressos</h2>
+            <form onsubmit="salvarPrecos(event)" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div>
+                    <label style="font-weight: bold; color: #810000; font-size: 13px;">Preço Inteira (R$)</label>
+                    <input type="number" step="0.50" class="input-padrao" style="margin-top: 6px;" value="12.00">
+                </div>
+                <div>
+                    <label style="font-weight: bold; color: #810000; font-size: 13px;">Preço Meia-Entrada (R$)</label>
+                    <input type="number" step="0.50" class="input-padrao" style="margin-top: 6px;" value="6.00">
+                </div>
+                <div>
+                    <label style="font-weight: bold; color: #810000; font-size: 13px;">Taxa VIP / Cadeira Especial (R$)</label>
+                    <input type="number" step="0.50" class="input-padrao" style="margin-top: 6px;" value="3.00">
+                </div>
+                <div style="grid-column: span 2;">
+                    <button type="submit" class="btn-comprar">Atualizar Tabela de Preços</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- SEÇÃO: GERIR CONTAS DE UTILIZADORES -->
+        <div id="sec-usuarios" class="admin-secao" style="display: none;">
+            <h2>Gerir Contas de Utilizadores e Permissões</h2>
+
+            <h3 style="color: #810000; font-size: 16px; margin-bottom: 10px;">Contas Cadastradas</h3>
+            <table class="tabela-usuarios">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>E-mail</th>
+                        <th>Perfil</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="listaUsuariosTabela">
+                    <tr id="user-1" data-nome="Administrador Master" data-cpf="111.111.111-11" data-telefone="(11) 99999-9999">
+                        <td>1</td>
+                        <td class="td-nome">Administrador Master</td>
+                        <td class="td-email">admin@takeum.com</td>
+                        <td class="td-perfil">Administrador</td>
+                        <td>
+                            <button type="button" class="btn-acao-tabela" onclick="abrirModalEditar('user-1')">Editar</button>
+                            <button type="button" class="btn-acao-tabela btn-excluir" onclick="excluirUser('user-1', 'admin@takeum.com')">Excluir</button>
+                        </td>
+                    </tr>
+                    <tr id="user-2" data-nome="João Cliente" data-cpf="222.222.222-22" data-telefone="(21) 98888-8888">
+                        <td>2</td>
+                        <td class="td-nome">João Cliente</td>
+                        <td class="td-email">cliente@exemplo.com</td>
+                        <td class="td-perfil">Cliente Padrão</td>
+                        <td>
+                            <button type="button" class="btn-acao-tabela" onclick="abrirModalEditar('user-2')">Editar</button>
+                            <button type="button" class="btn-acao-tabela btn-excluir" onclick="excluirUser('user-2', 'cliente@exemplo.com')">Excluir</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- MODAL DE EDIÇÃO DE UTILIZADOR -->
+    <div id="modalEditarUsuario" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close-btn" onclick="fecharModalEditar()">×</button>
+            <h2 style="color: #810000; font-size: 20px; margin-top: 0; margin-bottom: 20px;">Editar Conta de Utilizador</h2>
+            
+            <form onsubmit="salvarUsuarioModal(event)" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <input type="hidden" id="modalRowId">
+                <div style="grid-column: span 2;">
+                    <label style="font-weight: bold; color: #810000; font-size: 13px;">Nome Completo</label>
+                    <input type="text" id="editNomeUser" class="input-padrao" style="margin-top: 6px;" required placeholder="Nome do utilizador">
+                </div>
+                <div style="grid-column: span 2;">
+                    <label style="font-weight: bold; color: #810000; font-size: 13px;">E-mail</label>
+                    <input type="email" id="editEmailUser" class="input-padrao" style="margin-top: 6px;" required placeholder="usuario@email.com">
+                </div>
+                <div>
+                    <label style="font-weight: bold; color: #810000; font-size: 13px;">Nova Palavra-passe</label>
+                    <input type="password" id="editSenhaUser" class="input-padrao" style="margin-top: 6px;" placeholder="Deixe em branco para manter">
+                </div>
+                <div>
+                    <label style="font-weight: bold; color: #810000; font-size: 13px;">CPF</label>
+                    <input type="text" id="editCpfUser" class="input-padrao" style="margin-top: 6px;" placeholder="000.000.000-00">
+                </div>
+                <div>
+                    <label style="font-weight: bold; color: #810000; font-size: 13px;">Telefone / WhatsApp</label>
+                    <input type="text" id="editTelefoneUser" class="input-padrao" style="margin-top: 6px;" placeholder="(00) 00000-0000">
+                </div>
+                <div>
+                    <label style="font-weight: bold; color: #810000; font-size: 13px;">Tipo de Perfil / Nível</label>
+                    <select id="editTipoUser" class="input-padrao" style="margin-top: 6px;">
+                        <option value="cliente">Cliente Padrão</option>
+                        <option value="admin">Administrador</option>
+                    </select>
+                </div>
+                <div style="grid-column: span 2; margin-top: 10px;">
+                    <button type="submit" class="btn-comprar" style="width: 100%;">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts de Controle -->
+    <script>
+        function abrirMenu() {
+            document.getElementById("meuSidebar").style.left = "0";
+            document.getElementById("sidebarOverlay").style.display = "block";
+        }
+
+        function fecharMenu() {
+            document.getElementById("meuSidebar").style.left = "-280px";
+            document.getElementById("sidebarOverlay").style.display = "none";
+        }
+
+        // Verificação de autenticação de administrador
+        if (sessionStorage.getItem("isAdmin") !== "true") {
+            alert("Acesso restrito! Por favor, faça login como Administrador.");
+            window.location.href = "login.html";
+        }
+
+        function mostrarSecao(idSecao, botaoAba) {
+            document.querySelectorAll('.admin-secao').forEach(sec => sec.style.display = 'none');
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('ativa'));
+            
+            document.getElementById(idSecao).style.display = 'block';
+            botaoAba.classList.add('ativa');
+        }
+
+        function salvarFilme(e) {
+            e.preventDefault();
+            alert("Novo filme guardado no sistema!");
+        }
+
+        function salvarCinema(e) {
+            e.preventDefault();
+            alert("Novo cinema guardado no sistema!");
+        }
+
+        function salvarPrecos(e) {
+            e.preventDefault();
+            alert("Tabela de preços de ingressos atualizada!");
+        }
+
+        function abrirModalEditar(rowId) {
+            const linha = document.getElementById(rowId);
+            if (!linha) return;
+
+            // Guarda o ID da linha atual no campo oculto
+            document.getElementById('modalRowId').value = rowId;
+
+            // Recupera os dados armazenados na linha da tabela
+            const nome = linha.getAttribute('data-nome') || '';
+            const email = linha.querySelector('.td-email').textContent;
+            const perfilTexto = linha.querySelector('.td-perfil').textContent;
+            const cpf = linha.getAttribute('data-cpf') || '';
+            const telefone = linha.getAttribute('data-telefone') || '';
+
+            // Preenche os campos do modal
+            document.getElementById('editNomeUser').value = nome;
+            document.getElementById('editEmailUser').value = email;
+            document.getElementById('editSenhaUser').value = '';
+            document.getElementById('editCpfUser').value = cpf;
+            document.getElementById('editTelefoneUser').value = telefone;
+            document.getElementById('editTipoUser').value = (perfilTexto.toLowerCase().includes('admin')) ? 'admin' : 'cliente';
+
+            // Exibe o modal
+            document.getElementById('modalEditarUsuario').style.display = 'flex';
+        }
+
+        function fecharModalEditar() {
+            document.getElementById('modalEditarUsuario').style.display = 'none';
+        }
+
+        function salvarUsuarioModal(e) {
+            e.preventDefault();
+            const email = document.getElementById('editEmailUser').value;
+            alert(`Conta de ${email} atualizada com sucesso!`);
+            fecharModalEditar();
+        }
+
+        function excluirUser(rowId, email) {
+            if (confirm(`Tem certeza que deseja excluir a conta de ${email}?`)) {
+                const linha = document.getElementById(rowId);
+                if (linha) {
+                    linha.remove();
+                    alert(`Conta de ${email} excluída com sucesso!`);
+                }
+            }
+        }
+    </script>
+</body>
+</html>

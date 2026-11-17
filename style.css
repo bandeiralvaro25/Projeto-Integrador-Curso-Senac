@@ -1,0 +1,401 @@
+/* ==========================================================================
+   1. VARIÁVEIS E SISTEMA DE DESIGN (PALETA BORDÔ)
+   ========================================================================== */
+   :root {
+    --primary-color: #810000;
+    --primary-hover: #a82020;
+    --primary-dark: #500000;
+    --primary-light: #fff0f0;
+    --primary-subtle: #ffccd0;
+    --bg-gradient-overlay: rgba(255, 255, 255, 0.88);
+    --card-bg: rgba(255, 255, 255, 0.96);
+    --text-main: #2b2b2b;
+    --text-muted: #666666;
+    --border-light: #e2e8f0;
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 8px 24px rgba(129, 0, 0, 0.12);
+    --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.16);
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 18px;
+    --radius-pill: 24px;
+    --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  /* ==========================================================================
+     2. RESET E ESTILOS BASE
+     ========================================================================== */
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Roboto, -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+  }
+  
+  @keyframes moverFundoDiagonal {
+    0% { background-position: 0px 500px; }
+    100% { background-position: 500px 0px; }
+  }
+  
+  body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 100px !important;
+    background: linear-gradient(var(--bg-gradient-overlay), var(--bg-gradient-overlay)), 
+                url('images/pipoca.png');
+    background-size: 450px;
+    background-repeat: repeat;
+    animation: moverFundoDiagonal 50s linear infinite;
+    color: var(--text-main);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  
+  ::-webkit-scrollbar {
+    display: none !important;
+    width: 0px !important;
+    height: 0px !important;
+  }
+  
+  html, body, div, section, main {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+  
+  /* ==========================================================================
+     3. BARRA DE NAVEGAÇÃO E SIDEBAR (MENU LATERAL)
+     ========================================================================== */
+  .navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 75px;
+    z-index: 1000;
+    padding: 0 32px;
+    background: #ffffff;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 3px solid var(--primary-color);
+    box-sizing: border-box;
+  }
+  
+  .logo a {
+    font-size: 24px;
+    color: var(--primary-color);
+    font-weight: 800;
+    text-decoration: none;
+    letter-spacing: -0.5px;
+    padding: 4px 10px;
+    border-radius: var(--radius-sm);
+    transition: var(--transition-fast);
+  }
+  
+  .logo a:hover {
+    color: var(--primary-hover);
+  }
+  
+  .nav-links {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  
+  .btn-nav, .btn-menu-lateral, .btn-localizar {
+    background: var(--primary-color);
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 14px;
+    padding: 10px 18px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--primary-dark);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(129, 0, 0, 0.15);
+    transition: var(--transition-fast);
+    outline: none;
+  }
+  
+  .btn-nav:hover, .btn-menu-lateral:hover, .btn-localizar:hover {
+    background: var(--primary-hover);
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(129, 0, 0, 0.25);
+  }
+  
+  .sidebar {
+    height: 100%;
+    width: 280px;
+    position: fixed;
+    z-index: 3000;
+    top: 0;
+    left: -280px;
+    background-color: #ffffff;
+    overflow-x: hidden;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    padding-top: 60px;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+    border-right: 4px solid var(--primary-color);
+  }
+  
+  .sidebar a {
+    padding: 14px 24px;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--primary-color);
+    display: block;
+    transition: var(--transition-fast);
+    border-left: 4px solid transparent;
+  }
+  
+  .sidebar a:hover {
+    background-color: var(--primary-light);
+    border-left-color: var(--primary-color);
+    padding-left: 28px;
+  }
+  
+  .sidebar .close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 26px;
+    color: var(--primary-color);
+    cursor: pointer;
+    border: none;
+    background: none;
+    font-weight: bold;
+  }
+  
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
+    z-index: 2500;
+  }
+  
+  /* ==========================================================================
+     4. ESTRUTURA PRINCIPAL E CARTÕES
+     ========================================================================== */
+  .container, .main-container { 
+    width: 100%;
+    max-width: 900px; 
+    margin: 20px auto 40px auto !important; 
+    padding: 32px; 
+    background: var(--card-bg); 
+    border-radius: var(--radius-lg); 
+    box-shadow: var(--shadow-md); 
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-sizing: border-box;
+    position: relative !important;
+    z-index: 10 !important;
+  }
+  
+  .card {
+    background: #ffffff;
+    padding: 32px;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-light);
+  }
+  
+  h1 { 
+    margin: 0 0 20px; 
+    font-size: 28px; 
+    font-weight: 800;
+    color: var(--primary-color); 
+  }
+  
+  /* ==========================================================================
+     5. FORMULÁRIOS, INPUTS E BOTÕES
+     ========================================================================== */
+  .tabs { 
+    display: flex; 
+    gap: 12px; 
+    border-bottom: 2px solid var(--border-light); 
+    margin-bottom: 24px; 
+  }
+  
+  .tab { 
+    background: none; 
+    border: none; 
+    color: var(--text-muted); 
+    font-size: 16px; 
+    font-weight: 600;
+    padding: 12px 20px; 
+    cursor: pointer; 
+    border-bottom: 3px solid transparent; 
+    margin-bottom: -2px; 
+  }
+  
+  .tab.ativa { 
+    color: var(--primary-color); 
+    font-weight: 800; 
+    border-bottom-color: var(--primary-color); 
+  }
+  
+  .form-input, .input-padrao, .input-calendario {
+    padding: 12px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    border: 1.5px solid var(--primary-color);
+    background: #ffffff;
+    color: var(--text-main);
+    outline: none;
+    width: 100%;
+  }
+  
+  .btn-comprar, .btn-submit { 
+    background: var(--primary-color); 
+    color: #ffffff; 
+    border: 2px solid var(--primary-dark); 
+    border-radius: var(--radius-md); 
+    padding: 14px 40px; 
+    font-size: 18px; 
+    cursor: pointer; 
+    font-weight: 800; 
+    transition: var(--transition-fast);
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .btn-comprar:hover, .btn-submit:hover { 
+    background: var(--primary-hover); 
+    transform: translateY(-2px);
+  }
+  
+  .btn-comprar:disabled { 
+    opacity: 0.55; 
+    cursor: not-allowed; 
+  }
+  
+  /* ==========================================================================
+     6. CARDS DE CINEMA E HORÁRIOS (ESTILIZADOS COMO PÍLULAS)
+     ========================================================================== */
+  .cinema { 
+    background: #fff; 
+    border: 1px solid #ddd; 
+    border-radius: 18px; 
+    padding: 22px 24px; 
+    margin-bottom: 24px; 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
+  }
+  
+  .cinema-topo { 
+    display: flex; 
+    justify-content: space-between; 
+    gap: 16px; 
+    flex-wrap: wrap; 
+    padding-bottom: 18px; 
+    border-bottom: 1px solid #eee; 
+    margin-bottom: 18px; 
+  }
+  
+  .cinema-nome { 
+    font-weight: 700; 
+    font-size: 17px; 
+    color: var(--primary-color); 
+  }
+  
+  .cinema-end { 
+    color: var(--text-muted); 
+    font-size: 14px; 
+    margin-top: 4px; 
+  }
+  
+  /* Força o espaçamento e visual pílula em todos os botões de horário e assentos */
+  .horarios-container, .horarios {
+    display: flex !important;
+    gap: 12px !important;
+    flex-wrap: wrap !important;
+    margin-top: 12px !important;
+  }
+  
+  .horario-btn, .horario, button.acao, .btn-assentos {
+    border: 2px solid var(--primary-color) !important;
+    background: #ffffff !important;
+    color: var(--primary-color) !important;
+    border-radius: var(--radius-pill) !important;
+    padding: 8px 22px !important;
+    font-weight: 700 !important;
+    font-size: 14px !important;
+    cursor: pointer !important;
+    transition: var(--transition-fast) !important;
+    outline: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  
+  .horario-btn:hover, .horario:hover, button.acao:hover, .btn-assentos:hover, .horario-btn.ativo {
+    background: var(--primary-color) !important;
+    color: #ffffff !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 10px rgba(129, 0, 0, 0.2);
+  }
+  
+  .badge-tag, .badge-vibe {
+    background: var(--primary-color);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-right: 6px;
+  }
+  
+  /* ==========================================================================
+     7. CARROSSEL HORIZONTAL DE FILMES
+     ========================================================================== */
+  .carrossel-horizontal {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    justify-content: flex-start !important;
+    align-items: flex-start !important;
+    gap: 22px !important;
+    overflow-x: auto !important;
+    width: 100% !important;
+    padding: 10px 4px 20px 4px !important;
+    user-select: none;
+    scroll-behavior: smooth;
+  }
+  
+  .carrossel-horizontal > div { 
+    flex: 0 0 auto !important; 
+    width: 280px !important; 
+  }
+  
+  .poster-filme {
+    width: 280px !important;
+    height: 420px !important;
+    object-fit: cover !important;
+    border-radius: var(--radius-md);
+    border: 2px solid var(--primary-color);
+    padding: 4px;
+    background-color: #ffffff;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.3s ease;
+  }
+  
+  .poster-filme:hover { 
+    transform: translateY(-8px); 
+    box-shadow: var(--shadow-md);
+  }
+  
+  [hidden] { display: none !important; }

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meus Ingressos - Take Um</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Estilos gerais da tabela e layout de ingressos */
+        .container, .painel, .ingressos-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .tabela-ingressos, table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            font-size: 14px;
+            text-align: left;
+        }
+
+        .tabela-ingressos th, table th {
+            background-color: #810000;
+            color: #ffffff;
+            padding: 14px 16px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .tabela-ingressos td, table td {
+            padding: 12px 16px;
+            color: #333333;
+            border-bottom: 1px solid #eee;
+        }
+
+        .tabela-ingressos tr:nth-child(even), table tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+
+        .tabela-ingressos tr:hover, table tr:hover {
+            background-color: #f2f2f2;
+        }
+
+        input[type="text"], .input-padrao {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+        }
+
+        input[type="text"]:focus, .input-padrao:focus {
+            border-color: #810000;
+        }
+
+        /* Estilização dos botões Editar e Excluir com a cor #810000 */
+        td button, .btn-editar, .btn-excluir {
+            background-color: #810000 !important;
+            color: #ffffff !important;
+            padding: 6px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+
+        td button:hover, .btn-editar:hover, .btn-excluir:hover {
+            opacity: 0.85;
+        }
+
+        /* Organização da coluna de ações */
+        td:last-child {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Menu Lateral (Sidebar) -->
+    <div id="meuSidebar" class="sidebar">
+        <button class="close-btn" onclick="fecharMenu()">X</button>
+        <div style="padding: 0 24px 15px 24px; font-size: 18px; font-weight: bold; color: #810000; border-bottom: 2px solid #eee; margin-bottom: 10px;">
+            🎬 Navegação
+        </div>
+        <a href="filmes.html">🎥 Filmes em Cartaz</a>
+        <a href="compra.html">🎟️ Comprar Ingressos</a>
+        <a href="ingressos.html">📦 Meus Ingressos</a>
+        <a href="cinematch.html">🤝 CineMatch</a>
+        <a href="recompensas.html">🏆 Recompensas</a>
+        <a href="login.html">🔐 Entrar / Admin</a>
+    </div>
+    <div id="sidebarOverlay" class="sidebar-overlay" onclick="fecharMenu()"></div>
+
+    <!-- Barra de Navegação -->
+    <header class="navbar">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <button class="btn-menu-lateral" onclick="abrirMenu()">☰ Menu</button>
+            <div class="logo">
+                <a href="ingressos.html">Meus Ingressos</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contentor Principal -->
+    <main class="container">
+        <h1> Meus Ingressos Comprados</h1>
+
+        <div class="admin-toolbar">
+            <div class="stat-box">
+                Total de Ingressos: <span id="totalEventos" class="stat-value">0</span>
+            </div>
+            <div class="search-box">
+                <label for="buscarInput">Buscar:</label>
+                <input type="text" id="buscarInput" class="input-padrao" placeholder="Pesquisar por filme ou cinema...">
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table class="tabela-ingressos">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Filme</th>
+                        <th>Horário</th>
+                        <th>Tipo</th>
+                        <th>Data</th>
+                        <th>Cinema</th>
+                        <th>Lugares</th>
+                        <th style="text-align: center;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelaEventos">
+                    <!-- Preenchido dinamicamente via ingressos.js -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="ingressos.js"></script>
+    <script>
+        function abrirMenu() {
+            document.getElementById("meuSidebar").style.transform = "translateX(280px)";
+            document.getElementById("sidebarOverlay").style.display = "block";
+        }
+
+        function fecharMenu() {
+            document.getElementById("meuSidebar").style.transform = "translateX(0)";
+            document.getElementById("sidebarOverlay").style.display = "none";
+        }
+    </script>
+</body>
+</html>

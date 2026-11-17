@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprar Ingresso - Take Um</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<style>/* Layout principal da área de assentos e legenda */
+    .assentos-layout {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 30px;
+        justify-content: center;
+        align-items: flex-start;
+        margin-top: 25px;
+        padding: 20px;
+        background-color: #fafafa;
+        border-radius: 12px;
+        border: 1px solid #eee;
+    }
+    
+    /* Container do mapa + tela */
+    .mapa {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 25px;
+        overflow-x: auto;
+        padding: 10px;
+    }
+    
+    #mapa {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    /* Cada fileira horizontal */
+    .fileira {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    
+    /* Números das fileiras nas pontas */
+    .fileira .num {
+        width: 24px;
+        text-align: center;
+        font-weight: bold;
+        font-size: 13px;
+        color: #666;
+        user-select: none;
+    }
+    
+    /* Célula fixa para manter o alinhamento dos corredores vazios */
+    .cel {
+        width: 34px;
+        height: 34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Estilo base da poltrona */
+    .seat {
+        width: 32px;
+        height: 30px;
+        border: none;
+        border-radius: 8px 8px 3px 3px; /* Formato arredondado no encosto */
+        background-color: #e0e0e0;
+        color: #555;
+        font-size: 12px;
+        font-weight: bold;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 3px 0 #bdbdbd; /* Efeito 3D de base da poltrona */
+        transition: transform 0.15s ease, background-color 0.2s ease;
+    }
+    
+    .seat:hover:not(:disabled) {
+        background-color: #d0d0d0;
+        transform: translateY(-2px);
+    }
+    
+    /* Poltrona Selecionada */
+    .seat.selecionado {
+        background-color: #810000;
+        color: #fff;
+        box-shadow: 0 3px 0 #4d0000;
+    }
+    
+    /* Poltrona Ocupada */
+    .seat.ocupado {
+        background-color: #f2f2f2;
+        color: #ccc;
+        box-shadow: none;
+        border: 1px dashed #ccc;
+        cursor: not-allowed;
+    }
+    
+    /* Assento Cadeirante (AC) */
+    .seat.ac {
+        background-color: #2e5b82;
+        color: #fff;
+        box-shadow: 0 3px 0 #1b3852;
+        font-size: 10px;
+    }
+    
+    .seat.ac.selecionado {
+        background-color: #810000;
+        box-shadow: 0 3px 0 #4d0000;
+    }
+    
+    /* Representação da Tela de Cinema */
+    .tela {
+        width: 90%;
+        max-width: 380px;
+        padding: 8px 0;
+        text-align: center;
+        background: linear-gradient(180deg, #dcdcdc 0%, #f5f5f5 100%);
+        border-top: 4px solid #810000;
+        border-radius: 50% 50% 0 0 / 12px 12px 0 0; /* Leve curvatura de tela */
+        color: #555;
+        font-weight: bold;
+        font-size: 13px;
+        letter-spacing: 6px;
+        box-shadow: 0 -6px 15px rgba(129, 0, 0, 0.12);
+        margin-top: 10px;
+    }
+    
+    /* Legenda lateral */
+    .legenda {
+        background: #fff;
+        padding: 15px 20px;
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+        min-width: 200px;
+    }
+    
+    .legenda h4 {
+        margin: 12px 0 8px 0;
+        font-size: 13px;
+        color: #810000;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 4px;
+    }
+    
+    .legenda h4:first-child {
+        margin-top: 0;
+    }
+    
+    .leg-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 13px;
+        color: #444;
+        margin-bottom: 8px;
+    }
+    
+    .leg-item i {
+        display: inline-block;
+        width: 18px;
+        height: 18px;
+        border-radius: 5px 5px 2px 2px;
+    }
+    
+    .i-disp   { background-color: #e0e0e0; box-shadow: 0 2px 0 #bdbdbd; }
+    .i-sel    { background-color: #810000; box-shadow: 0 2px 0 #4d0000; }
+    .i-ocup   { background-color: #f2f2f2; border: 1px dashed #ccc; }
+    .i-normal { background-color: #e0e0e0; box-shadow: 0 2px 0 #bdbdbd; }
+    .i-ac     { background-color: #2e5b82; box-shadow: 0 2px 0 #1b3852; }
+    </style>
+<body>
+
+    <!-- Menu Lateral (Sidebar) -->
+    <div id="meuSidebar" class="sidebar">
+        <button class="close-btn" onclick="fecharMenu()">×</button>
+        <div style="padding: 0 24px 15px 24px; font-size: 18px; font-weight: bold; color: #810000; border-bottom: 2px solid #eee; margin-bottom: 10px;">
+            🎬 Navegação
+        </div>
+        <a href="filmes.html">🎥 Filmes em Cartaz</a>
+        <a href="compra.html">🎟️ Comprar Ingressos</a>
+        <a href="ingressos.html">📦 Meus Ingressos</a>
+        <a href="cinematch.html">🤝 CineMatch</a>
+        <a href="recompensas.html">🏆 Recompensas</a>
+        <a href="login.html">🔐 Entrar / Admin</a>
+    </div>
+    <div id="sidebarOverlay" class="sidebar-overlay" onclick="fecharMenu()"></div>
+
+    <header class="navbar">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <button class="btn-menu-lateral" onclick="abrirMenu()">☰ Menu</button>
+            <div class="logo">
+                <a href="filmes.html">Filmes</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <!-- TELA 1: SESSÕES -->
+        <section id="viewSessoes">
+            <h1 id="tituloFilme"></h1>
+
+            <div class="tabs">
+                <button class="tab ativa" data-tab="sessoes">Sessões</button>
+                <button class="tab" data-tab="sobre">Sobre</button>
+                <button class="tab" data-tab="trailers">Trailers</button>
+            </div>
+
+            <div id="tabSessoes">
+                <div class="painel-filtros-topo">
+                    <div class="localizacao-container">
+                        <label for="inputEndereco">Sua Localização ou Endereço:</label>
+                        <div class="input-localizacao-grupo">
+                            <input type="text" id="inputEndereco" class="input-padrao" placeholder="Ex: Taguatinga, Lago Sul, Guará...">
+                            <button type="button" id="btnBuscarLocal" class="btn-localizar">Filtrar</button>
+                        </div>
+                    </div>
+
+                    <div class="calendario-container">
+                        <label for="dataSessao">Escolha a data da sessão:</label>
+                        <input type="date" id="dataSessao" class="input-calendario">
+                    </div>
+                </div>
+                <div class="aviso-localizacao" id="avisoLocal">Mostrando todos os cinemas disponíveis. Digite sua região para encontrar os mais próximos.</div>
+
+                <div style="margin: 20px 0; background: #fff5f5; padding: 15px; border-radius: 8px; border: 1px dashed #810000;">
+                    <label style="font-weight: bold; color: #810000; display: block; margin-bottom: 8px;">✨ Filtro de "Vibe" da Sessão:</label>
+                    <select id="selectVibe" class="input-padrao" style="width: 100%;">
+                        <option value="todos">Todas as Vibrações / Perfis</option>
+                        <option value="silencio">🔇 Sessão Silêncio Total (Ideal para cinéfilos focados)</option>
+                        <option value="familia">🧸 Sessão Família/Infantil (Luzes amenas e som ajustado)</option>
+                        <option value="fa">🎉 Sessão Fã/Barulhenta (Liberado comemorar e aplaudir)</option>
+                    </select>
+                </div>
+
+                <div class="filtros" id="filtros"></div>
+                <div id="listaCinemas"></div>
+            </div>
+            <div id="tabSobre" hidden><p class="vazio">Informações sobre o filme em breve.</p></div>
+            <div id="tabTrailers" hidden><p class="vazio">Trailers em breve.</p></div>
+        </section>
+
+        <!-- TELA 2: ASSENTOS -->
+        <section id="viewAssentos" hidden>
+            <div class="painel">
+                <button class="voltar" id="btnVoltar">← Voltar às sessões</button>
+                <div class="painel-cinema" id="painelCinema"></div>
+                <h2 id="painelTitulo"></h2>
+                <div class="badges" id="painelBadges"></div>
+                <div class="horarios" id="painelHorarios"></div>
+
+                <div style="margin: 15px 0; background: #f0f8ff; padding: 12px; border-radius: 8px; border: 1px solid #4682b4; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong style="color: #2e5b82; display: block; font-size: 14px;">🤖 Sugestão Inteligente de Assentos</strong>
+                        <span style="font-size: 13px; color: #555;" id="textoSugestaoAlgoritmo">Selecione seu objetivo para receber recomendações automáticas.</span>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button type="button" onclick="sugerirAssentos('solitario')" class="btn-nav" style="padding: 6px 12px; font-size: 12px;">Modo Solitário</button>
+                        <button type="button" onclick="sugerirAssentos('grupo')" class="btn-nav" style="padding: 6px 12px; font-size: 12px;">Modo Grupo</button>
+                    </div>
+                </div>
+
+                <div class="tabs">
+                    <button class="tab ativa" data-sub="assentos">Assentos</button>
+                    <button class="tab" data-sub="precos">Preços</button>
+                </div>
+
+                <div id="subAssentos">
+                    <div class="assentos-layout">
+                        <div class="mapa">
+                            <div id="mapa"></div>
+                            <div class="tela">TELA</div>
+                        </div>
+                        <div class="legenda">
+                            <h4>Status</h4>
+                            <div class="leg-item"><i class="i-disp"></i> Disponível</div>
+                            <div class="leg-item"><i class="i-sel"></i> Selecionado</div>
+                            <div class="leg-item"><i class="i-ocup"></i> Ocupado</div>
+                            <h4>Normal</h4>
+                            <div class="leg-item"><i class="i-normal"></i> Sofá Duo Luxo Privativo</div>
+                            <h4>Especial</h4>
+                            <div class="leg-item"><i class="i-ac"></i> Cadeirante</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="subPrecos" hidden>
+                    <table class="tabela-precos" id="tabelaPrecos"></table>
+                </div>
+
+                <div class="rodape">
+                    <div class="resumo" id="resumo"></div>
+                    <button class="btn-comprar" id="btnComprar" disabled>Comprar</button>
+                    <div class="msg" id="msg"></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        function abrirMenu() {
+            document.getElementById("meuSidebar").style.transform = "translateX(280px)";
+            document.getElementById("sidebarOverlay").style.display = "block";
+        }
+
+        function fecharMenu() {
+            document.getElementById("meuSidebar").style.transform = "translateX(0)";
+            document.getElementById("sidebarOverlay").style.display = "none";
+        }
+
+        const CINEMAS = [
+            { id: 'araujo',   nome: 'Cine Araújo Lago Sul',            endereco: 'Aer Presidente Juscelino Kubitscheck, 0 | Lago Sul', regiao: 'lago sul',
+              tags: ['VIP', 'LASER', 'NACIONAL'], vibe: 'silencio', horarios: ['12:40', '15:20'] },
+            { id: 'cineflix', nome: 'Cineflix JK Shopping (Brasília)', endereco: 'AV. HÉLIO PRATES, 250 | Taguatinga', regiao: 'taguatinga',
+              tags: ['NACIONAL'], vibe: 'familia', horarios: ['16:45', '19:30'] },
+            { id: 'kinoplex', nome: 'Kinoplex Park Shopping',          endereco: 'SIA Trecho 3, Lote 1745 | Guará', regiao: 'guara',
+              tags: ['NORMAL', 'NACIONAL'], vibe: 'fa', horarios: ['14:00', '17:10', '20:30'] }
+        ];
+        const PRECO_BASE = { Inteira: 40, Meia: 20 };
+        const ADICIONAL_VIP = 20;
+
+        const LAYOUT = {
+            8: { start: 1 }, 7: { start: 1 }, 6: { start: 1 }, 5: { start: 1 }, 4: { start: 1 },
+            3: { start: 2 },
+            2: { start: 2, ac: [0, 1] },
+            1: { start: 2 }
+        };
+        const COLUNAS = 9;
+
+        const params = new URLSearchParams(window.location.search);
+        const filme = params.get('filme') || 'Filme';
+        
+        const hojeStr = new Date().toISOString().split('T')[0];
+        const estado = { dataSelecionada: hojeStr, termoLocal: '', vibeSelecionada: 'todos', filtros: new Set(), cinema: null, horario: null, selecionados: new Set(), tipo: 'Inteira' };
+
+        const $ = id => document.getElementById(id);
+        const brl = n => n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+        document.title = 'Comprar - ' + filme;
+        $('tituloFilme').textContent = filme;
+
+        const inputData = $('dataSessao');
+        inputData.value = hojeStr;
+        inputData.min = hojeStr;
+
+        inputData.onchange = (e) => {
+            estado.dataSelecionada = e.target.value;
+            renderCinemas();
+        };
+
+        $('selectVibe').onchange = (e) => {
+            estado.vibeSelecionada = e.target.value;
+            renderCinemas();
+        };
+
+        $('btnBuscarLocal').onclick = () => {
+            estado.termoLocal = $('inputEndereco').value.toLowerCase().trim();
+            renderCinemas();
+        };
+
+        function renderCinemas() {
+            const lista = $('listaCinemas');
+            lista.innerHTML = '';
+
+            const visiveis = CINEMAS.filter(c => {
+                const atendeFiltros = [...estado.filtros].every(f => c.tags.includes(f.toUpperCase()));
+                const atendeLocal = !estado.termoLocal || c.regiao.includes(estado.termoLocal) || c.endereco.toLowerCase().includes(estado.termoLocal);
+                const atendeVibe = estado.vibeSelecionada === 'todos' || c.vibe === estado.vibeSelecionada;
+                return atendeFiltros && atendeLocal && atendeVibe;
+            });
+
+            if (!visiveis.length) {
+                lista.innerHTML = '<p class="vazio">Nenhum cinema encontrado para esta Vibe ou localização.</p>';
+                return;
+            }
+
+            visiveis.forEach(c => {
+                const card = document.createElement('div');
+                card.className = 'cinema';
+                
+                const tagsHtml = c.tags.map(t => `<span class="badge">${t}</span>`).join(' ');
+                const vibeHtml = `<span class="badge">Vibe: ${c.vibe.toUpperCase()}</span>`;
+                const horariosHtml = c.horarios.map(h => `<button class="horario" data-h="${h}">${h}</button>`).join(' ');
+
+                card.innerHTML = `
+                    <div class="cinema-topo">
+                        <div>
+                            <div class="cinema-nome">${c.nome}</div>
+                            <div class="cinema-end">${c.endereco}</div>
+                        </div>
+                        <div class="acoes">
+                            <button class="btn-nav" data-a="assentos">🏷️ Assentos</button>
+                        </div>
+                    </div>
+                    <div class="badges">
+                        ${tagsHtml}
+                        ${vibeHtml}
+                    </div>
+                    <div class="horarios">
+                        ${horariosHtml}
+                    </div>
+                `;
+
+                card.querySelectorAll('.horario').forEach(b => b.onclick = () => abrirAssentos(c, b.dataset.h));
+                card.querySelector('[data-a="assentos"]').onclick = () => abrirAssentos(c, c.horarios[0]);
+                
+                lista.appendChild(card);
+            });
+        }
+
+        function abrirAssentos(cinema, horario) {
+            estado.cinema = cinema;
+            estado.horario = horario;
+            estado.selecionados.clear();
+            $('msg').textContent = '';$('viewSessoes').hidden = true;
+            $('viewAssentos').hidden = false;
+            window.scrollTo(0, 0);
+            renderPainel();
+        }
+
+        function renderPainel() {
+            $('painelCinema').textContent = estado.cinema.nome;
+            $('painelTitulo').textContent = filme;
+            $('painelBadges').innerHTML = estado.cinema.tags.map(t => `<span class="badge">${t}</span>`).join(' ');
+            $('painelHorarios').innerHTML = estado.cinema.horarios.map(h => `<button class="horario ${h === estado.horario ? 'ativo' : ''}">${h}</button>`).join(' ');
+            renderMapa();
+            renderPrecos();
+            atualizarResumo();
+        }
+
+        function sugerirAssentos(modo) {
+            estado.selecionados.clear();
+            const fileiraAlvo = 5;
+            
+            if (modo === 'solitario') {
+                const idSugerido = `${fileiraAlvo}-5`;
+                if (!ocupado(idSugerido)) {
+                    estado.selecionados.add(idSugerido);
+                } else {
+                    estado.selecionados.add(`${fileiraAlvo}-3`);
+                }
+                $('textoSugestaoAlgoritmo').textContent = 'Modo Solitário aplicado: Assento confortável nas extremidades sugerido.';
+            } else if (modo === 'grupo') {
+                ['4', '5', '6'].forEach(colNum => {
+                    const idBloco = `${fileiraAlvo}-${colNum}`;
+                    if (!ocupado(idBloco)) estado.selecionados.add(idBloco);
+                });
+                $('textoSugestaoAlgoritmo').textContent = 'Modo Grupo aplicado: Bloco central de 3 lugares selecionado automaticamente.';
+            }
+            renderMapa();
+            atualizarResumo();
+        }
+
+        function ocupado(chave) {
+            let h = 0;
+            const s = `${estado.cinema.id}|${estado.dataSelecionada}|${estado.horario}|${chave}`;
+            for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+            return h % 100 < 22;
+        }
+
+        function renderMapa() {
+            const mapa = $('mapa');
+            mapa.innerHTML = '';
+
+            for (let fileira = 8; fileira >= 1; fileira--) {
+                const cfg = LAYOUT[fileira];
+                const linha = document.createElement('div');
+                linha.className = 'fileira';
+                linha.innerHTML = `<span class="num">${fileira}</span>`;
+
+                let numero = 0;
+                for (let col = 0; col < COLUNAS; col++) {
+                    const cel = document.createElement('div');
+                    cel.className = 'cel';
+
+                    const ehAC = cfg.ac && cfg.ac.includes(col);
+                    const ehSeat = col >= cfg.start;
+
+                    if (ehAC || ehSeat) {
+                        numero++;
+                        const id = `${fileira}-${ehAC ? 'AC' : ''}${numero}`;
+                        const btn = document.createElement('button');
+                        const isOcup = ocupado(id);
+                        btn.className = 'seat ' + (ehAC ? 'ac' : 'normal');
+                        btn.dataset.id = id;
+                        btn.innerHTML = ehAC ? 'AC' : '<span>☆</span>';
+
+                        if (isOcup) {
+                            btn.classList.add('ocupado');
+                            btn.disabled = true;
+                        } else {
+                            if (estado.selecionados.has(id)) btn.classList.add('selecionado');
+                            btn.onclick = () => {
+                                estado.selecionados.has(id) ? estado.selecionados.delete(id) : estado.selecionados.add(id);
+                                btn.classList.toggle('selecionado');
+                                atualizarResumo();
+                            };
+                        }
+                        cel.appendChild(btn);
+                    }
+                    linha.appendChild(cel);
+                }
+                linha.insertAdjacentHTML('beforeend', `<span class="num">${fileira}</span>`);
+                mapa.appendChild(linha);
+            }
+        }
+
+        function renderPrecos() {
+            const vip = estado.cinema.tags.includes('VIP');
+            $('tabelaPrecos').innerHTML = Object.keys(PRECO_BASE).map(tipo => `
+                <tr>
+                    <td><label><input type="radio" name="tipo" value="${tipo}" ${estado.tipo === tipo ? 'checked' : ''}> ${tipo}</label></td>
+                    <td>${brl(PRECO_BASE[tipo] + (vip ? ADICIONAL_VIP : 0))}</td>
+                </tr>
+            `).join('');
+        }
+
+        function atualizarResumo() {
+            const qtd = estado.selecionados.size;
+            $('btnComprar').disabled = qtd === 0;
+            if (qtd === 0) {
+                $('resumo').textContent = 'Selecione os assentos desejados.';
+                return;
+            }
+            const lugares = [...estado.selecionados].sort().join(', ');
+            $('resumo').textContent = `${qtd} assentos (${lugares}) · ${brl(qtd * 40)}`;
+        }
+
+        $('btnComprar').onclick = async () => {
+            const dados = { nome: filme, horario: estado.horario, tipo: estado.tipo, data: estado.dataSelecionada, cinema: estado.cinema.nome, lugares: estado.selecionados.size };
+            await fetch('/api/eventos', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dados) });
+            window.location.href = 'ingressos.html';
+        };
+
+        renderCinemas();
+    </script>
+</body>
+</html>

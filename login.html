@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Take Um</title>
+    <style>
+        @keyframes moverFundoDiagonal {
+            0% { background-position: 0px 500px; }
+            100% { background-position: 500px 0px; }
+        }
+
+        /* Estilos gerais e fundo padrão com transparência suave */
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #fcf6ec;
+            background-image: linear-gradient(rgba(252, 246, 236, 0.88), rgba(252, 246, 236, 0.88)), 
+                              url('images/pipoca.png');
+            background-size: 450px;
+            background-repeat: repeat;
+            animation: moverFundoDiagonal 50s linear infinite;
+            color: #333333;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Barra de Navegação (Navbar) */
+        .navbar {
+            background-color: #ffffff;
+            border-bottom: 2px solid #810000;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+        }
+
+        .btn-menu-lateral {
+            background-color: #810000;
+            color: #ffffff;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .btn-menu-lateral:hover {
+            background-color: #590000;
+        }
+
+        .logo a {
+            color: #810000;
+            font-size: 20px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        /* Menu Lateral (Sidebar) */
+        .sidebar {
+            height: 100%;
+            width: 280px;
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+            left: -280px;
+            background-color: #ffffff;
+            overflow-x: hidden;
+            transition: left 0.3s ease;
+            padding-top: 60px;
+            box-shadow: 3px 0 12px rgba(0, 0, 0, 0.12);
+        }
+
+        .sidebar a {
+            padding: 12px 24px;
+            text-decoration: none;
+            font-size: 16px;
+            color: #333333;
+            display: block;
+            transition: 0.2s;
+        }
+
+        .sidebar a:hover {
+            background-color: #f8f0f0;
+            color: #810000;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 22px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #810000;
+            font-weight: bold;
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 999;
+        }
+
+        /* Container Principal e Painel de Login */
+        .container {
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 0 20px;
+        }
+
+        .painel-login {
+            background-color: #ffffff;
+            border-radius: 14px;
+            padding: 35px 40px;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
+            border: 1px solid #f0e6d8;
+        }
+
+        /* Abas de Navegação (Entrar / Administrador) */
+        .tabs-login {
+            display: flex;
+            border-bottom: 2px solid #e0e0e0;
+            margin-bottom: 25px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            padding: 10px 0;
+            font-size: 15px;
+            font-weight: 600;
+            color: #777777;
+            cursor: pointer;
+            text-align: center;
+            position: relative;
+            transition: color 0.2s;
+        }
+
+        .tab-btn.ativa {
+            color: #810000;
+        }
+
+        .tab-btn.ativa::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: #810000;
+        }
+
+        /* Títulos e Formulários */
+        .login-titulo {
+            color: #810000;
+            font-size: 20px;
+            font-weight: 700;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 700;
+            color: #333333;
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+
+        .input-padrao {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1px solid #d4a373;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+            box-sizing: border-box;
+            background-color: #ffffff;
+            transition: border-color 0.2s;
+        }
+
+        .input-padrao:focus {
+            border-color: #810000;
+        }
+
+        /* Botão de Submissão */
+        .btn-submit {
+            width: 100%;
+            background-color: #810000;
+            color: #ffffff;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover {
+            background-color: #590000;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Menu Lateral (Sidebar) -->
+    <div id="meuSidebar" class="sidebar">
+        <button class="close-btn" onclick="fecharMenu()">×</button>
+        <div style="padding: 0 24px 15px 24px; font-size: 18px; font-weight: bold; color: #810000; border-bottom: 2px solid #eee; margin-bottom: 10px;">
+            🎬 Navegação
+        </div>
+        <a href="filmes.html">🎥 Filmes em Cartaz</a>
+        <a href="compra.html">🎟️ Comprar Ingressos</a>
+        <a href="ingressos.html">📦 Meus Ingressos</a>
+        <a href="cinematch.html">🤝 CineMatch</a>
+        <a href="passaporte.html">🏆 Passaporte Digital</a>
+        <a href="login.html">🔐 Entrar / Admin</a>
+    </div>
+    <div id="sidebarOverlay" class="sidebar-overlay" onclick="fecharMenu()"></div>
+
+    <!-- Barra de Navegação -->
+    <header class="navbar">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <button class="btn-menu-lateral" onclick="abrirMenu()">☰ Menu</button>
+            <div class="logo">
+                <a href="login.html">Login</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="container">
+        <div class="painel-login">
+            <!-- Abas alternáveis -->
+            <div class="tabs-login">
+                <button class="tab-btn" onclick="mudarAba('cliente')">Entrar</button>
+                <button class="tab-btn ativa" onclick="mudarAba('admin')">Administrador</button>
+            </div>
+
+            <!-- Seção de Acesso -->
+            <div id="secaoLogin">
+                <h2 class="login-titulo" id="tituloLogin">Acesso Restrito - Admin</h2>
+                <form onsubmit="realizarLogin(event)">
+                    <div class="form-group">
+                        <label id="labelUsuario">Utilizador Admin</label>
+                        <input type="text" class="input-padrao" id="inputUsuario" value="admin" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label id="labelSenha">Palavra-passe Admin</label>
+                        <input type="password" class="input-padrao" id="inputSenha" required>
+                    </div>
+
+                    <button type="submit" class="btn-submit" id="btnBotao">Painel de Gestão</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts de Interação e Autenticação -->
+    <script>
+        function abrirMenu() {
+            document.getElementById("meuSidebar").style.left = "0";
+            document.getElementById("sidebarOverlay").style.display = "block";
+        }
+
+        function fecharMenu() {
+            document.getElementById("meuSidebar").style.left = "-280px";
+            document.getElementById("sidebarOverlay").style.display = "none";
+        }
+
+        let tipoAtual = 'admin';
+
+        function mudarAba(tipo) {
+            tipoAtual = tipo;
+            const btns = document.querySelectorAll('.tab-btn');
+            btns.forEach(b => b.classList.remove('ativa'));
+            
+            if(tipo === 'cliente') {
+                btns[0].classList.add('ativa');
+                document.getElementById('tituloLogin').textContent = 'Área do Cliente';
+                document.getElementById('labelUsuario').textContent = 'E-mail';
+                document.getElementById('inputUsuario').value = '';
+                document.getElementById('inputUsuario').placeholder = 'seu@email.com';
+                document.getElementById('labelSenha').textContent = 'Palavra-passe';
+                document.getElementById('btnBotao').textContent = 'Entrar';
+            } else {
+                btns[1].classList.add('ativa');
+                document.getElementById('tituloLogin').textContent = 'Acesso Restrito - Admin';
+                document.getElementById('labelUsuario').textContent = 'Utilizador Admin';
+                document.getElementById('inputUsuario').value = 'admin';
+                document.getElementById('labelSenha').textContent = 'Palavra-passe Admin';
+                document.getElementById('btnBotao').textContent = 'Painel de Gestão';
+            }
+        }
+
+        function realizarLogin(e) {
+            e.preventDefault();
+            if (tipoAtual === 'admin') {
+                // Salva a permissão de admin e redireciona para o painel
+                sessionStorage.setItem("isAdmin", "true");
+                window.location.href = "admin.html";
+            } else {
+                alert("Login de cliente realizado com sucesso!");
+                window.location.href = "filmes.html";
+            }
+        }
+    </script>
+</body>
+</html>

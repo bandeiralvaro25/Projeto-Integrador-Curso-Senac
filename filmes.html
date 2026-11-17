@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filmes em Cartaz - Take Um</title>
+    <style>
+        :root {
+            --primary-color: #810000;
+            --primary-hover: #a82020;
+            --primary-dark: #500000;
+            --primary-light: #fff0f0;
+            --card-bg: rgba(255, 255, 255, 0.96);
+            --text-main: #2b2b2b;
+            --radius-md: 12px;
+            --radius-lg: 18px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
+
+        @keyframes moverFundoDiagonal {
+            0% { background-position: 0px 500px; }
+            100% { background-position: 500px 0px; }
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 100px;
+            background: linear-gradient(rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.88)), url('images/pipoca.png');
+            background-size: 450px;
+            background-repeat: repeat;
+            animation: moverFundoDiagonal 50s linear infinite;
+            color: var(--text-main);
+        }
+
+        ::-webkit-scrollbar { display: none !important; width: 0px !important; }
+
+        .navbar {
+            position: fixed; top: 0; left: 0; width: 100%; height: 75px; z-index: 1000; padding: 0 32px;
+            background: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--primary-color);
+        }
+
+        .logo a { font-size: 24px; color: var(--primary-color); font-weight: 800; text-decoration: none; }
+        .btn-menu-lateral, .btn-nav {
+            background: var(--primary-color); color: #fff; font-weight: 700; font-size: 14px;
+            padding: 10px 18px; border-radius: 8px; border: 1.5px solid var(--primary-dark); cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
+        }
+        .btn-menu-lateral:hover, .btn-nav:hover { background: var(--primary-hover); }
+
+        .sidebar {
+            height: 100%; width: 280px; position: fixed; z-index: 3000; top: 0; left: -280px;
+            background-color: #ffffff; transition: transform 0.3s ease; padding-top: 60px; box-shadow: 4px 0 20px rgba(0,0,0,0.15); border-right: 4px solid var(--primary-color);
+        }
+        .sidebar a { padding: 14px 24px; text-decoration: none; font-size: 15px; font-weight: 700; color: var(--primary-color); display: block; }
+        .sidebar a:hover { background-color: var(--primary-light); }
+        .sidebar .close-btn { position: absolute; top: 15px; right: 20px; font-size: 26px; color: var(--primary-color); cursor: pointer; border: none; background: none; }
+        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.5); z-index: 2500; }
+
+        .container {
+            width: 100%; max-width: 1100px; margin: 20px auto 40px auto; padding: 32px;
+            background: var(--card-bg); border-radius: var(--radius-lg); box-shadow: 0 8px 24px rgba(129,0,0,0.12); border: 1px solid rgba(255,255,255,0.8);
+        }
+
+        h1 { margin: 0 0 20px; font-size: 28px; font-weight: 800; color: var(--primary-color); background-color: #810000; color: white; border-radius: 8px; padding: 8px;}
+
+        .carrossel-horizontal {
+            display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: flex-start; align-items: flex-start;
+            gap: 22px; overflow-x: auto; width: 100%; padding: 10px 4px 20px 4px; user-select: none; scroll-behavior: smooth;
+        }
+        .carrossel-horizontal > div { flex: 0 0 auto; width: 280px; text-align: center; }
+        .poster-filme {
+            width: 280px; height: 420px; object-fit: cover; border-radius: var(--radius-md);
+            border: 2px solid var(--primary-color); padding: 4px; background-color: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.06); transition: transform 0.3s ease;
+        }
+        .poster-filme:hover { transform: translateY(-8px); }
+        /* ==========================================================================
+   BARRA DE ROLAGEM INVISÍVEL PARA O CARROSSEL HORIZONTAL
+   ========================================================================== */
+
+/* Para navegadores baseados em WebKit (Chrome, Safari, Edge, Opera) */
+.carrossel-horizontal::-webkit-scrollbar {
+  display: none !important;
+  width: 0px !important;
+  height: 0px !important;
+}
+
+/* Para Firefox e outros navegadores modernos */
+.carrossel-horizontal {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+    </style>
+</head>
+<body>
+
+    <div id="meuSidebar" class="sidebar">
+        <button class="close-btn" onclick="fecharMenu()">×</button>
+        <div style="padding: 0 24px 15px 24px; font-size: 18px; font-weight: bold; color: #810000; border-bottom: 2px solid #eee; margin-bottom: 10px;">🎬 Navegação</div>
+        <a href="filmes.html">🎥 Filmes em Cartaz</a>
+        <a href="compra.html">🎟️ Comprar Ingressos</a>
+        <a href="ingressos.html">📦 Meus Ingressos</a>
+        <a href="cinematch.html">🤝 CineMatch</a>
+        <a href="recompensas.html">🏆 Recompensas</a>
+        <a href="login.html">🔐 Entrar / Admin</a>
+    </div>
+    <div id="sidebarOverlay" class="sidebar-overlay" onclick="fecharMenu()"></div>
+
+    <header class="navbar">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <button class="btn-menu-lateral" onclick="abrirMenu()">☰ Menu</button>
+            <div class="logo"><a href="filmes.html">Filmes</a></div>
+        </div>
+    </header>
+
+        <h1>Filmes em cartaz</h1>
+        <p style="color: #555; margin-bottom: 20px;">Deslize para o lado para ver todos os filmes em cartaz e clique num poster para comprar.</p>
+
+        <!-- CARROSSEL: Filmes em Cartaz -->
+        <div class="carrossel-horizontal">
+            <div>
+                <a href="compra.html?filme=Se%20eu%20fosse%20você"><img src="images/se-eu-fosse-voce-3.webp" alt="Se eu fosse você" class="poster-filme"></a>
+                <p style="font-weight: bold; color: #810000; margin-top: 8px;">Se eu fosse você</p>
+            </div>
+            <div>
+                <a href="compra.html?filme=100%20Dias"><img src="images/100-Dias.webp" alt="100 Dias" class="poster-filme"></a>
+                <p style="font-weight: bold; color: #810000; margin-top: 8px;">100 Dias</p>
+            </div>
+            <div>
+                <a href="compra.html?filme=Street%20Fighter"><img src="images/Street-Fighter.jpg" alt="Street Fighter" class="poster-filme"></a>
+                <p style="font-weight: bold; color: #810000; margin-top: 8px;">Street Fighter</p>
+            </div>
+            <div>
+                <a href="compra.html?filme=Três%20horas%20para%20viver"><img src="images/Três-horas-para-viver.webp" alt="Três horas para viver" class="poster-filme"></a>
+                <p style="font-weight: bold; color: #810000; margin-top: 8px;">Três horas para viver</p>
+            </div>
+            <div>
+                <a href="compra.html?filme=O%20bosque%20selvagem"><img src="images/O-Bosque-Selvagem.webp" alt="O bosque selvagem" class="poster-filme"></a>
+                <p style="font-weight: bold; color: #810000; margin-top: 8px;">O bosque selvagem</p>
+            </div>
+            <div>
+                <a href="compra.html?filme=Verity"><img src="images/Verity.jpg" alt="Verity" class="poster-filme"></a>
+                <p style="font-weight: bold; color: #810000; margin-top: 8px;">Verity</p>
+            </div>
+            <div>
+                <a href="compra.html?filme=O%20outro%20lado%20das%20redes"><img src="images/o-outro-lado-das-redes-cartaz-994x1024.png" alt="O outro lado das redes" class="poster-filme"></a>
+                <p style="font-weight: bold; color: #810000; margin-top: 8px;">O outro lado das redes</p>
+            </div>
+        </div>
+
+        <h1 style="margin-top: 40px;">Lançamentos</h1>
+        <p style="color: #555; margin-bottom: 20px;">Deslize para o lado para ver todos os lançamentos e clique num poster para comprar.</p>
+
+        <!-- CARROSSEL: Filmes Futuros -->
+        <div class="carrossel-horizontal">
+            <div>
+                <a href="compra.html?filme=Batman%202"><img src="images/The-Batman-2.jpg" alt="Batman 2" class="poster-filme"></a>
+                <p style="font-weight: bold; color: #810000; margin-top: 8px;">Batman 2</p>
+            </div>
+            <div>
+                <a href="compra.html?filme=As%20Crônicas%20de%20Nárnia"><img src="images/As-Crônicas-De-Nárnia.webp" alt="As Crônicas de Nárnia" class="poster-filme"></a>
+                <p style="font-weight: bold; color: #810000; margin-top: 8px; font-size: 13px;">As Crônicas de Nárnia</p>
+            </div>
+            <div>
+                <a href="compra.html?filme=Beekeeper%202"><img src="images/Beekeeper-2.webp" alt="Beekeeper 2" class="poster-filme"></a>
+                <p style="font-weight: bold; color: #810000; margin-top: 8px;">Beekeeper 2: Sem Perdão</p>
+            </div>
+            <div>
+                <a href="compra.html?filme=Tigre%20de%20Papel"><img src="images/Tigre-De-Papel.webp" alt="Tigre de Papel" class="poster-filme"></a>
+                <p style="font-weight: bold; color: #810000; margin-top: 8px;">Tigre de Papel</p>
+            </div>
+            <div>
+                <a href="compra.html?filme=Thomas%20Crown"><img src="images/Thomas-Crown-A-Arte-Do-Crime.webp" alt="Thomas Crown" class="poster-filme"></a>
+                <p style="font-weight: bold; color: #810000; margin-top: 8px;">Thomas Crown: A Arte do Crime</p>
+            </div>
+            <div>
+                <a href="compra.html?filme=Os%20Simpsons%202"><img src="images/Os-Simpsons-2.webp" alt="Os Simpsons 2" class="poster-filme"></a>
+                <p style="font-weight: bold; color: #810000; margin-top: 8px;">Os Simpsons 2</p>
+            </div>
+            <div>
+                <a href="compra.html?filme=Jumanji%20Mundo%20Real"><img src="images/Jumanji-Mundo-Real.webp" alt="Jumanji Mundo Real" class="poster-filme"></a>
+                <p style="font-weight: bold; color: #810000; margin-top: 8px;">Jumanji: Mundo Real</p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Funções do menu lateral
+    function abrirMenu() { 
+        document.getElementById("meuSidebar").style.transform = "translateX(280px)"; 
+        document.getElementById("sidebarOverlay").style.display = "block"; 
+    }
+    
+    function fecharMenu() { 
+        document.getElementById("meuSidebar").style.transform = "translateX(0)"; 
+        document.getElementById("sidebarOverlay").style.display = "none"; 
+    }
+
+    // Funcionalidade de arrastar o carrossel com o rato (Mouse Drag to Scroll)
+    document.querySelectorAll('.carrossel-horizontal').forEach(carrossel => {
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+
+        carrossel.addEventListener('mousedown', (e) => {
+            isDown = true;
+            carrossel.classList.add('ativo');
+            startX = e.pageX - carrossel.offsetLeft;
+            scrollLeft = carrossel.scrollLeft;
+        });
+
+        carrossel.addEventListener('mouseleave', () => {
+            isDown = false;
+            carrossel.classList.remove('ativo');
+        });
+
+        carrossel.addEventListener('mouseup', () => {
+            isDown = false;
+            carrossel.classList.remove('ativo');
+        });
+
+        carrossel.addEventListener('mousemove', (e) => {
+            if (!isDown) return; // Se o rato não estiver premido, não faz nada
+            e.preventDefault();
+            const x = e.pageX - carrossel.offsetLeft;
+            const walk = (x - startX) * 2; // Velocidade de arrastamento
+            carrossel.scrollLeft = scrollLeft - walk;
+        });
+    });
+        function abrirMenu() { document.getElementById("meuSidebar").style.transform = "translateX(280px)"; document.getElementById("sidebarOverlay").style.display = "block"; }
+        function fecharMenu() { document.getElementById("meuSidebar").style.transform = "translateX(0)"; document.getElementById("sidebarOverlay").style.display = "none"; }
+    </script>
+</body>
+</html>
